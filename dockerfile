@@ -5,21 +5,21 @@ WORKDIR /code
 
 # Install system dependencies for PyMuPDF
 RUN apt-get update && apt-get install -y \
-    libglib2.0-0 libsm6 libxrender1 libxext6 poppler-utils
-
-# Copy requirements if you have one (optional)
-# If you don’t have requirements.txt, we install manually below
-# COPY requirements.txt .
-# RUN pip install -r requirements.txt
+    libglib2.0-0 libsm6 libxrender1 libxext6 poppler-utils && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-RUN pip install fastapi uvicorn openai firebase-admin pymupdf gradio
+# (Make sure you have requirements.txt in repo)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 7860
+# Expose FastAPI port
+EXPOSE 8000
 
 # Start FastAPI server
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+# Your file uses: api = FastAPI()
+# So import path is main:api   (if file name is main.py)
+CMD ["uvicorn", "main:api", "--host", "0.0.0.0", "--port", "8000"]
